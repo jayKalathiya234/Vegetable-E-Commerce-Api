@@ -1,5 +1,60 @@
 const user = require("../models/userModels");
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
+let otp = 123456
+
+exports.createAdminUser = async (req, res) => {
+  try {
+    let { firstName, lastName, email, password } = req.body;
+
+    let checkUserIsExist = await user.findOne({ email });
+
+    if (checkUserIsExist) {
+      return res.status(409).json({ status: 409, message: "User Is Already Exist" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    checkUserIsExist = await user.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      otp,
+      role: 'admin'
+    });
+
+
+    const transport = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification Code",
+      text: `Your code is: ${otp} `
+    }
+
+    transport.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+      }
+    })
+
+    return res.status(201).json({ status: 201, message: "Admin Create SuccessFully...", user: checkUserIsExist });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+}
 
 exports.createUser = async (req, res) => {
   try {
@@ -21,7 +76,31 @@ exports.createUser = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
+      otp,
+      role: 'user'
     });
+
+    const transport = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification Code",
+      text: `Your code is: ${otp} `
+    }
+
+    transport.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+      }
+    })
 
     return res.status(201).json({ status: 201, message: "User Create SuccessFully...", user: checkUserIsExist, });
 
@@ -66,7 +145,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.user._id
 
     let getUserId = await user.findById(id)
 
@@ -84,12 +163,16 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUserById = async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.user._id
 
     let updateUserId = await user.findById(id)
 
     if (!updateUserId) {
       return res.status(404).json({ status: 404, message: "user not found" })
+    }
+
+    if (req.file) {
+      req.body.image = req.file.path
     }
 
     updateUserId = await user.findByIdAndUpdate(id, { ...req.body }, { new: true });
@@ -104,7 +187,7 @@ exports.updateUserById = async (req, res) => {
 
 exports.deleteUserById = async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.user._id
 
     let deleteUserId = await user.findById(id)
 

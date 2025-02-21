@@ -9,6 +9,10 @@ const userSchema = mongoose.Schema({
     type: String,
     require: true,
   },
+  image: {
+    type: String,
+    require: true,
+  },
   email: {
     type: String,
     require: true,
@@ -18,9 +22,14 @@ const userSchema = mongoose.Schema({
     require: true,
   },
   otp: {
-    type: String,
+    type: Number,
     require: true,
   },
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    require: true
+  }
 }, {
   timestamps: true,
   versionKey: false,
