@@ -6,7 +6,9 @@ const { createTerms, getAllTerms, getTermsById, updateTermsById, deleteTermsAndB
 const { userLogin, emailOtpVerify, forgotPassword, resetPassword, changePassword } = require("../auth/auth");
 const upload = require("../helper/imageUplode");
 const { auth } = require("../helper/authToken");
-const { createAddress, getAllAddress } = require("../controller/addressController");
+const { createAddress, getAllAddress, getAddressById, updateAddressById, deleteAddressById, getAllMyAddress } = require("../controller/addressController");
+const { createCategory, getAllCategory, getCategoryById, updateCategoryById, deleteCategoryById } = require("../controller/categoryController");
+const { createReason } = require("../controller/reasonforCancellationController");
 const indexRoutes = express.Router();
 
 // auth Routes
@@ -54,5 +56,21 @@ indexRoutes.delete('/deleteTerms/:id', auth(['admin']), deleteTermsAndById)
 
 indexRoutes.post('/createAddress', auth(['user', 'admin']), createAddress)
 indexRoutes.get('/allAddress', auth(['admin']), getAllAddress)
+indexRoutes.get('/getAddress/:id', auth(['admin', 'user']), getAddressById)
+indexRoutes.put('/updateAddress/:id', auth(['admin', 'user']), updateAddressById)
+indexRoutes.delete('/deleteAddress/:id', auth(['admin']), deleteAddressById)
+indexRoutes.get('/allMyAddress', auth(['admin', 'user']), getAllMyAddress)
+
+// category Routes
+
+indexRoutes.post('/createCategory', auth(['admin', 'user']), upload.single('categoryImage'), createCategory)
+indexRoutes.get('/allCategory', auth(['admin', 'user']), getAllCategory)
+indexRoutes.get('/getCategory/:id', auth(['admin', 'user']), getCategoryById)
+indexRoutes.put('/updateCategory/:id', auth(['admin', 'user']), upload.single('categoryImage'), updateCategoryById)
+indexRoutes.delete('/deleteCategory/:id', auth(['admin', 'user']), deleteCategoryById)
+
+// Reason For Cancellation Routes
+
+indexRoutes.post('/createReason', auth(['admin', 'user']), createReason)
 
 module.exports = indexRoutes;
