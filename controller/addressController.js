@@ -1,4 +1,5 @@
 const address = require('../models/addresModels')
+const mongoose = require('mongoose')
 
 exports.createAddress = async (req, res) => {
     try {
@@ -38,7 +39,16 @@ exports.getAllAddress = async (req, res) => {
 
         let paginatedAddress;
 
-        paginatedAddress = await address.find()
+        paginatedAddress = await address.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            }
+        ])
 
         let count = paginatedAddress.length
 
@@ -64,7 +74,21 @@ exports.getAddressById = async (req, res) => {
     try {
         let id = req.params.id
 
-        let getAddressId = await address.findById(id)
+        let getAddressId = await address.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            }
+        ])
 
         if (!getAddressId) {
             return res.status(404).json({ status: 404, message: "Address Not Found" })

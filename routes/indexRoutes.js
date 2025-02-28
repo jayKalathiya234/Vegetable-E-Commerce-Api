@@ -13,7 +13,8 @@ const { createProduct, getAllProducts, getProductById, updateProductById, update
 const { createProductVarient, getAllProductVarient, getProductVarientById, updateProductVarientById, deleteProductVarientById } = require("../controller/productVarientController");
 const { createCart, getAllCarts, getCartsById, updateCartsById, deleteCartById, getAllMyCarts } = require("../controller/cartController");
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, deleteCoupenById } = require("../controller/coupenController");
-const { createOrder, getAllOrders } = require("../controller/orderController");
+const { createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderStatusById, deleteOrderById, getAllMyOrders } = require("../controller/orderController");
+const { createCancelOrder, getAllCancelOrder, getCancelOrderById } = require("../controller/cancelOrderController");
 const indexRoutes = express.Router();
 
 // auth Routes
@@ -121,5 +122,15 @@ indexRoutes.delete('/deleteCoupen/:id', auth(['admin', 'user']), deleteCoupenByI
 
 indexRoutes.post('/createOrder', auth(['admin', 'user']), createOrder)
 indexRoutes.get('/allOrders', auth(['admin', 'user']), getAllOrders)
+indexRoutes.get('/getOrder/:id', auth(['admin', 'user']), getOrderById)
+indexRoutes.put('/updateOrderStatus/:id', auth(['admin', 'user']), updateOrderStatusById)
+indexRoutes.delete('/deleteOrder/:id', auth(['admin', 'user']), deleteOrderById)
+indexRoutes.get('/allMyOrders', auth(['admin', 'user']), getAllMyOrders)
+
+// Cancel Order Roues
+
+indexRoutes.post('/cancelOrder',auth(['user']), createCancelOrder)
+indexRoutes.get('/allCancelOrder', getAllCancelOrder)
+indexRoutes.get('/getCancelOrder/:id', getCancelOrderById)
 
 module.exports = indexRoutes;

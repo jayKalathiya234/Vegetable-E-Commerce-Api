@@ -99,6 +99,88 @@ exports.getAllOrders = async (req, res) => {
 
 exports.getOrderById = async (req, res) => {
     try {
+        let id = req.params.id
+
+        let getOrderId = await order.findById(id)
+
+        if (!getOrderId) {
+            return res.status(404).json({ status: 404, message: "Order Not Found" })
+        }
+
+        return res.status(200).json({ status: 200, message: "Order Found SuccessFully...", order: getOrderId })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, message: error.message })
+    }
+}
+
+exports.updateOrderStatusById = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let updateOrderId = await order.findById(id)
+
+        if (!updateOrderId) {
+            return res.statsu(404).json({ status: 404, message: "Order Not Found" })
+        }
+
+        updateOrderId = await order.findByIdAndUpdate(id, { ...req.body }, { new: true })
+
+        return res.status(200).json({ status: 200, message: "Order Status Updated SuccessFully...", order: updateOrderId })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, message: error.message })
+    }
+}
+
+exports.deleteOrderById = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let deleteOrderId = await order.findById(id)
+
+        if (!deleteOrderId) {
+            return res.status(404).json({ status: 404, message: "Order Not Found" })
+        }
+
+        await order.findByIdAndDelete(id)
+
+        return res.status(200).json({ status: 200, message: "Order Delete SuccessFully..." })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, message: error.message })
+    }
+}
+
+exports.getAllMyOrders = async (req, res) => {
+    try {
+        let page = parseInt(req.query.page)
+        let pageSize = parseInt(req.query.pageSize)
+
+        if (page < 1 || pageSize < 1) {
+            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+        }
+
+        let paginatedMyOrders;
+
+        paginatedMyOrders = await order.find({ userId: req.user._id })
+
+        let count = paginatedMyOrders.length
+
+        if (count === 0) {
+            return res.status(404).json({ status: 404, message: 'Order Not Found' })
+        }
+
+        if (page && pageSize) {
+            let startIndex = (page - 1) * pageSize
+            let lastIndex = (startIndex + pageSize)
+            paginatedMyOrders = await paginatedMyOrders.slice(startIndex, lastIndex)
+        }
+
+        return res.status(200).json({ status: 200, totalMyOrders: count, message: "All Orders Found SuccessFully...", allMyOrders: paginatedMyOrders })
 
     } catch (error) {
         console.log(error)

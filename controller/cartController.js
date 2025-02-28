@@ -1,4 +1,5 @@
 const cart = require('../models/cartModels')
+const mongoose = require('mongoose')
 
 exports.createCart = async (req, res) => {
     try {
@@ -39,7 +40,24 @@ exports.getAllCarts = async (req, res) => {
 
         let paginatedCarts;
 
-        paginatedCarts = await cart.find()
+        paginatedCarts = await cart.aggregate([
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            }
+        ])
 
         let count = paginatedCarts.length
 
@@ -65,7 +83,29 @@ exports.getCartsById = async (req, res) => {
     try {
         let id = req.params.id
 
-        let getCartId = await cart.findById(id)
+        let getCartId = await cart.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            }
+        ])
 
         if (!getCartId) {
             return res.status(404).json({ status: 404, message: "Cart Not Found" })
@@ -130,7 +170,29 @@ exports.getAllMyCarts = async (req, res) => {
 
         let paginatedMyCarts;
 
-        paginatedMyCarts = await cart.find({ userId: req.user._id })
+        paginatedMyCarts = await cart.aggregate([
+            {
+                $match: {
+                    userId: req.user._id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            }
+        ])
 
         let count = paginatedMyCarts.length
 
