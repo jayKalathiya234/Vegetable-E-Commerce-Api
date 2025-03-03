@@ -153,7 +153,21 @@ exports.getAllMyAddress = async (req, res) => {
 
         let paginatedAddress;
 
-        paginatedAddress = await address.find({ userId: req.user._id })
+        paginatedAddress = await address.aggregate([
+            {
+                $match: {
+                    userId: req.user._id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            }
+        ])
 
         let count = paginatedAddress.length
 

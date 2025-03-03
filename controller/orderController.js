@@ -2,6 +2,7 @@ const order = require('../models/orderModels')
 const cart = require('../models/cartModels')
 const Coupon = require('../models/coupenModels')
 const ProductVariant = require('../models/productVarientModels')
+const mongoose = require('mongoose')
 
 exports.createOrder = async (req, res) => {
     try {
@@ -69,10 +70,42 @@ exports.getAllOrders = async (req, res) => {
         paginatedOrders = await order.aggregate([
             {
                 $lookup: {
+                    from: 'products',
+                    localField: "items.productId",
+                    foreignField: '_id',
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "items.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'coupens',
+                    localField: 'coupenId',
+                    foreignField: "_id",
+                    as: "coupenData"
+                }
+            },
+            {
+                $lookup: {
                     from: "users",
                     localField: "userId",
                     foreignField: "_id",
                     as: "userData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'addresses',
+                    localField: "addressId",
+                    foreignField: "_id",
+                    as: "addressData"
                 }
             }
         ])
@@ -101,7 +134,53 @@ exports.getOrderById = async (req, res) => {
     try {
         let id = req.params.id
 
-        let getOrderId = await order.findById(id)
+        let getOrderId = await order.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: "items.productId",
+                    foreignField: '_id',
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "items.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'coupens',
+                    localField: 'coupenId',
+                    foreignField: "_id",
+                    as: "coupenData"
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'addresses',
+                    localField: "addressId",
+                    foreignField: "_id",
+                    as: "addressData"
+                }
+            }
+        ])
 
         if (!getOrderId) {
             return res.status(404).json({ status: 404, message: "Order Not Found" })
@@ -166,7 +245,53 @@ exports.getAllMyOrders = async (req, res) => {
 
         let paginatedMyOrders;
 
-        paginatedMyOrders = await order.find({ userId: req.user._id })
+        paginatedMyOrders = await order.aggregate([
+            {
+                $match: {
+                    userId: req.user._id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: "items.productId",
+                    foreignField: '_id',
+                    as: "productData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "items.productVarientId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'coupens',
+                    localField: 'coupenId',
+                    foreignField: "_id",
+                    as: "coupenData"
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'addresses',
+                    localField: "addressId",
+                    foreignField: "_id",
+                    as: "addressData"
+                }
+            }
+        ])
 
         let count = paginatedMyOrders.length
 

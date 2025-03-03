@@ -37,9 +37,9 @@ indexRoutes.delete('/deleteUser', auth(['admin', 'user']), deleteUserById)
 // contactus routes
 
 indexRoutes.post('/createContactUs', auth(['user']), createContactUs)
-indexRoutes.get('/allContactUs', auth(['admin', 'user']), getAllContactUs)
-indexRoutes.get('/getContactUs/:id', auth(['admin', 'user']), getContactUsById)
-indexRoutes.delete('/deleteContactUs/:id', auth(['admin', 'user']), deleteContactUsById)
+indexRoutes.get('/allContactUs', auth(['admin']), getAllContactUs)
+indexRoutes.get('/getContactUs/:id', auth(['admin']), getContactUsById)
+indexRoutes.delete('/deleteContactUs/:id', auth(['admin']), deleteContactUsById)
 
 // FAQ Routes
 
@@ -48,7 +48,6 @@ indexRoutes.get('/allFaqs', auth(['admin', 'user']), getAllFaqs)
 indexRoutes.get('/getFaq/:id', auth(['admin', 'user']), getFaqById)
 indexRoutes.put('/updateFaq/:id', auth(['admin']), updateFaqById)
 indexRoutes.delete('/deleteFaq/:id', auth(['admin']), deleteFaqById)
-
 
 // Terms & Condition Routes
 
@@ -64,7 +63,7 @@ indexRoutes.post('/createAddress', auth(['user', 'admin']), createAddress)
 indexRoutes.get('/allAddress', auth(['admin']), getAllAddress)
 indexRoutes.get('/getAddress/:id', auth(['admin', 'user']), getAddressById)
 indexRoutes.put('/updateAddress/:id', auth(['admin', 'user']), updateAddressById)
-indexRoutes.delete('/deleteAddress/:id', auth(['admin']), deleteAddressById)
+indexRoutes.delete('/deleteAddress/:id', auth(['admin', 'user']), deleteAddressById)
 indexRoutes.get('/allMyAddress', auth(['admin', 'user']), getAllMyAddress)
 
 // category Routes
@@ -129,7 +128,7 @@ indexRoutes.get('/allMyOrders', auth(['admin', 'user']), getAllMyOrders)
 
 // Cancel Order Roues
 
-indexRoutes.post('/cancelOrder',auth(['user']), createCancelOrder)
+indexRoutes.post('/cancelOrder', auth(['user']), createCancelOrder)
 indexRoutes.get('/allCancelOrder', getAllCancelOrder)
 indexRoutes.get('/getCancelOrder/:id', getCancelOrderById)
 
