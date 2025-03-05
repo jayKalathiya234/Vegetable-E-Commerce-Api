@@ -5,7 +5,7 @@ let otp = 123456
 
 exports.createAdminUser = async (req, res) => {
   try {
-    let { firstName, lastName, email, password } = req.body;
+    let { mobileNo, email, password } = req.body;
 
     let checkUserIsExist = await user.findOne({ email });
 
@@ -17,8 +17,7 @@ exports.createAdminUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     checkUserIsExist = await user.create({
-      firstName,
-      lastName,
+      mobileNo,
       email,
       password: hashedPassword,
       otp,

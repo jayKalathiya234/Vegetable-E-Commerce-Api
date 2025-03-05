@@ -44,14 +44,13 @@ const orderSchema = mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['Confirmed', 'Shipped', 'outForDelivery', 'Delivered', 'Cancelled'],
-        default: 'Confirmed',
+        enum: ['Pending', 'Confirmed', 'Shipped', 'outForDelivery', 'Delivered', 'Cancelled'],
+        default: 'Pending',
         require: true
     },
-    paymentMethod: {
+    paymentStatus: {
         type: String,
         enum: ['Received', 'not Received'],
-        default: 'Received',
         require: true
     }
 }, {

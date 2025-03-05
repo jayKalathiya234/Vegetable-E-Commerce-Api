@@ -3,7 +3,7 @@ const { createUser, getAllUsers, getUserById, updateUserById, deleteUserById, cr
 const { createContactUs, getAllContactUs, getContactUsById, updateContactUsById, deleteContactUsById } = require("../controller/contactUsController");
 const { createFaq, getAllFaqs, getFaqById, updateFaqById, deleteFaqById } = require("../controller/FaqController");
 const { createTerms, getAllTerms, getTermsById, updateTermsById, deleteTermsAndById } = require("../controller/TermsAndConditionController");
-const { userLogin, emailOtpVerify, forgotPassword, resetPassword, changePassword } = require("../auth/auth");
+const { userLogin, emailOtpVerify, forgotPassword, resetPassword, changePassword, userGoggleLogin } = require("../auth/auth");
 const upload = require("../helper/imageUplode");
 const { auth } = require("../helper/authToken");
 const { createAddress, getAllAddress, getAddressById, updateAddressById, deleteAddressById, getAllMyAddress } = require("../controller/addressController");
@@ -15,11 +15,15 @@ const { createCart, getAllCarts, getCartsById, updateCartsById, deleteCartById, 
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, deleteCoupenById } = require("../controller/coupenController");
 const { createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderStatusById, deleteOrderById, getAllMyOrders } = require("../controller/orderController");
 const { createCancelOrder, getAllCancelOrder, getCancelOrderById } = require("../controller/cancelOrderController");
+const { createStock, getAllStocks, getStockById, updateStockById, deleteStockById } = require("../controller/stockController");
+const { createRejectOrder, getAllRejectOrders, getRejectOrderById } = require("../controller/rejectOrderController");
+const { createPayment, getAllPayments, getPaymentById } = require("../controller/paymentController");
 const indexRoutes = express.Router();
 
 // auth Routes
 
 indexRoutes.post('/userLogin', userLogin)
+indexRoutes.post('/userGoggleLogin', userGoggleLogin)
 indexRoutes.post('/emailOtpVerify', emailOtpVerify)
 indexRoutes.post('/forgotPassword', forgotPassword)
 indexRoutes.put('/resetPassword/:id', resetPassword)
@@ -129,7 +133,27 @@ indexRoutes.get('/allMyOrders', auth(['admin', 'user']), getAllMyOrders)
 // Cancel Order Roues
 
 indexRoutes.post('/cancelOrder', auth(['user']), createCancelOrder)
-indexRoutes.get('/allCancelOrder', getAllCancelOrder)
-indexRoutes.get('/getCancelOrder/:id', getCancelOrderById)
+indexRoutes.get('/allCancelOrder', auth(['user']), getAllCancelOrder)
+indexRoutes.get('/getCancelOrder/:id', auth(['user']), getCancelOrderById)
+
+// Stock Routes
+
+indexRoutes.post('/createStock', auth(['admin']), createStock)
+indexRoutes.get('/allStocks', auth(['admin']), getAllStocks)
+indexRoutes.get('/getStock/:id', auth(['admin']), getStockById)
+indexRoutes.put('/updateStock/:id', auth(['admin']), updateStockById)
+indexRoutes.delete('/deleteStock/:id', auth(['admin']), deleteStockById)
+
+// Reject Order 
+
+indexRoutes.post('/rejectOrder', auth(['admin', 'user']), createRejectOrder)
+indexRoutes.get('/allRejectedOrders', auth(['admin', 'user']), getAllRejectOrders)
+indexRoutes.get('/getRejectOrder/:id', auth(['admin', 'user']), getRejectOrderById)
+
+// Payment Routes
+
+indexRoutes.post('/createPayment', auth(['admin', 'user']), createPayment);
+indexRoutes.get('/allPayments', auth(['admin', 'user']), getAllPayments)
+indexRoutes.get('/getPayment/:id', auth(['admin', 'user']), getPaymentById)
 
 module.exports = indexRoutes;

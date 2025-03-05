@@ -107,7 +107,7 @@ exports.deleteTermsAndById = async (req, res) => {
         await terms.findByIdAndDelete(id)
 
         return res.status(200).json({ status: 200, message: "Terms Data Deleted SuccessFully..." })
-        
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, message: error.message })

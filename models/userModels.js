@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema({
   email: {
     type: String,
     require: true,
+    unique: true
   },
   password: {
     type: String,
@@ -24,6 +25,18 @@ const userSchema = mongoose.Schema({
   otp: {
     type: Number,
     require: true,
+  },
+  uid: {
+    type: String,
+    require: true
+  },
+  userName: {
+    type: String,
+    require: true
+  },
+  mobileNo: {
+    type: String,
+    require: true
   },
   role: {
     type: String,
