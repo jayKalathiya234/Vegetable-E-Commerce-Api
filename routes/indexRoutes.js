@@ -1,23 +1,25 @@
 const express = require("express");
-const { createUser, getAllUsers, getUserById, updateUserById, deleteUserById, createAdminUser } = require("../controller/userController");
+const { createUser, getAllUsers, getUserById, updateUserById, deleteUserById, createAdminUser, setGstNumber, createBrandDetails, setBankDetails, pickUpAddress, userDasboard } = require("../controller/userController");
 const { createContactUs, getAllContactUs, getContactUsById, updateContactUsById, deleteContactUsById } = require("../controller/contactUsController");
 const { createFaq, getAllFaqs, getFaqById, updateFaqById, deleteFaqById } = require("../controller/FaqController");
 const { createTerms, getAllTerms, getTermsById, updateTermsById, deleteTermsAndById } = require("../controller/TermsAndConditionController");
 const { userLogin, emailOtpVerify, forgotPassword, resetPassword, changePassword, userGoggleLogin } = require("../auth/auth");
-const upload = require("../helper/imageUplode");
-const { auth } = require("../helper/authToken");
 const { createAddress, getAllAddress, getAddressById, updateAddressById, deleteAddressById, getAllMyAddress } = require("../controller/addressController");
-const { createCategory, getAllCategory, getCategoryById, updateCategoryById, deleteCategoryById } = require("../controller/categoryController");
+const { createCategory, getAllCategory, getCategoryById, updateCategoryById, deleteCategoryById, checkemail } = require("../controller/categoryController");
 const { createReason, getAllReasons, getReasonById, updateReasonById, deleteReasonById } = require("../controller/reasonforCancellationController");
-const { createProduct, getAllProducts, getProductById, updateProductById, updatePackSizeById, deletePackSizeById, deleteProductById } = require("../controller/productController");
+const { createProduct, getAllProducts, getProductById, updateProductById, updatePackSizeById, deletePackSizeById, deleteProductById, getProductByCategory } = require("../controller/productController");
 const { createProductVarient, getAllProductVarient, getProductVarientById, updateProductVarientById, deleteProductVarientById } = require("../controller/productVarientController");
 const { createCart, getAllCarts, getCartsById, updateCartsById, deleteCartById, getAllMyCarts } = require("../controller/cartController");
-const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, deleteCoupenById } = require("../controller/coupenController");
+const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, deleteCoupenById, getAllExpireCoupen } = require("../controller/coupenController");
 const { createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderStatusById, deleteOrderById, getAllMyOrders } = require("../controller/orderController");
 const { createCancelOrder, getAllCancelOrder, getCancelOrderById } = require("../controller/cancelOrderController");
 const { createStock, getAllStocks, getStockById, updateStockById, deleteStockById } = require("../controller/stockController");
 const { createRejectOrder, getAllRejectOrders, getRejectOrderById } = require("../controller/rejectOrderController");
 const { createPayment, getAllPayments, getPaymentById } = require("../controller/paymentController");
+const { getDashboardSummary, getSalesByCategory, getRevenueStatistics, getRecentOrders } = require("../controller/dashboardController");
+const { GetPaymentSummary, GetPaymentDistribution, getPaymentComparison, getTransactionDetails } = require("../controller/paymentDashBoardController");
+const upload = require("../helper/imageUplode");
+const { auth } = require("../helper/authToken");
 const indexRoutes = express.Router();
 
 // auth Routes
@@ -27,9 +29,31 @@ indexRoutes.post('/userGoggleLogin', userGoggleLogin)
 indexRoutes.post('/emailOtpVerify', emailOtpVerify)
 indexRoutes.post('/forgotPassword', forgotPassword)
 indexRoutes.put('/resetPassword/:id', resetPassword)
-indexRoutes.put('/changePassword', auth(['admin', 'user']), changePassword)
+indexRoutes.get('/userDasboard', userDasboard)
 
-// user routes
+// Admin Dashboard
+
+indexRoutes.get('/getDashboardSummary', auth(['admin']), getDashboardSummary)
+indexRoutes.get('/salesByCategory', auth(['admin']), getSalesByCategory)
+indexRoutes.get('/revenueStatistics', auth(['admin']), getRevenueStatistics)
+indexRoutes.get('/recentOrders', auth(['admin']), getRecentOrders)
+
+// Payment Dashboard
+
+indexRoutes.get('/paymentSummary', auth(['admin']), GetPaymentSummary)
+indexRoutes.get('/paymentDistribution', auth(['admin']), GetPaymentDistribution)
+indexRoutes.get('/getPaymentComparison', auth(['admin']), getPaymentComparison)
+indexRoutes.get('/transactionDetails', auth(['admin']), getTransactionDetails)
+
+// Admin Details Routes
+
+indexRoutes.put('/changePassword', auth(['admin', 'user']), changePassword)
+indexRoutes.put('/setGstNumber', auth(['admin']), setGstNumber)
+indexRoutes.put('/setBrandDetails', auth(['admin']), createBrandDetails)
+indexRoutes.put('/setBankDetails', auth(['admin']), setBankDetails)
+indexRoutes.put('/setPickUpAddress', auth(['admin']), pickUpAddress)
+
+// user routes 
 
 indexRoutes.post('/createAdmin', createAdminUser)
 indexRoutes.post("/createUser", createUser);
@@ -38,28 +62,13 @@ indexRoutes.get('/getUser', auth(['admin', 'user']), getUserById)
 indexRoutes.put('/updateUser', auth(['admin', 'user']), upload.single('image'), updateUserById)
 indexRoutes.delete('/deleteUser', auth(['admin', 'user']), deleteUserById)
 
-// contactus routes
+// category Routes
 
-indexRoutes.post('/createContactUs', auth(['user']), createContactUs)
-indexRoutes.get('/allContactUs', auth(['admin']), getAllContactUs)
-indexRoutes.get('/getContactUs/:id', auth(['admin']), getContactUsById)
-indexRoutes.delete('/deleteContactUs/:id', auth(['admin']), deleteContactUsById)
-
-// FAQ Routes
-
-indexRoutes.post('/createFaq', auth(['admin']), createFaq);
-indexRoutes.get('/allFaqs', auth(['admin', 'user']), getAllFaqs)
-indexRoutes.get('/getFaq/:id', auth(['admin', 'user']), getFaqById)
-indexRoutes.put('/updateFaq/:id', auth(['admin']), updateFaqById)
-indexRoutes.delete('/deleteFaq/:id', auth(['admin']), deleteFaqById)
-
-// Terms & Condition Routes
-
-indexRoutes.post('/createTerm', auth(['admin']), createTerms)
-indexRoutes.get('/allTerms', auth(['admin', 'user']), getAllTerms)
-indexRoutes.get('/getTerms/:id', auth(['admin', 'user']), getTermsById)
-indexRoutes.put('/updateTerms/:id', auth(['admin']), updateTermsById)
-indexRoutes.delete('/deleteTerms/:id', auth(['admin']), deleteTermsAndById)
+indexRoutes.post('/createCategory', auth(['admin']), upload.single('categoryImage'), createCategory)
+indexRoutes.get('/allCategory', auth(['admin', 'user']), getAllCategory)
+indexRoutes.get('/getCategory/:id', auth(['admin', 'user']), getCategoryById)
+indexRoutes.put('/updateCategory/:id', auth(['admin']), upload.single('categoryImage'), updateCategoryById)
+indexRoutes.delete('/deleteCategory/:id', auth(['admin']), deleteCategoryById)
 
 // address Routes
 
@@ -70,31 +79,14 @@ indexRoutes.put('/updateAddress/:id', auth(['admin', 'user']), updateAddressById
 indexRoutes.delete('/deleteAddress/:id', auth(['admin', 'user']), deleteAddressById)
 indexRoutes.get('/allMyAddress', auth(['admin', 'user']), getAllMyAddress)
 
-// category Routes
-
-indexRoutes.post('/createCategory', auth(['admin']), upload.single('categoryImage'), createCategory)
-indexRoutes.get('/allCategory', auth(['admin', 'user']), getAllCategory)
-indexRoutes.get('/getCategory/:id', auth(['admin', 'user']), getCategoryById)
-indexRoutes.put('/updateCategory/:id', auth(['admin']), upload.single('categoryImage'), updateCategoryById)
-indexRoutes.delete('/deleteCategory/:id', auth(['admin']), deleteCategoryById)
-
-// Reason For Cancellation Routes
-
-indexRoutes.post('/createReason', auth(['admin']), createReason)
-indexRoutes.get('/allReasons', auth(['admin', 'user']), getAllReasons)
-indexRoutes.get('/getReason/:id', auth(['admin', 'user']), getReasonById)
-indexRoutes.put('/updateReason/:id', auth(['admin']), updateReasonById)
-indexRoutes.delete('/deleteReason/:id', auth(['admin']), deleteReasonById)
-
 // product Routes
 
 indexRoutes.post('/createProduct', auth(['admin', 'user']), upload.fields([{ name: 'images' }]), createProduct)
 indexRoutes.get('/allProducts', auth(['admin', 'user']), getAllProducts)
 indexRoutes.get('/getProduct/:id', auth(['admin', 'user']), getProductById)
 indexRoutes.put('/updateProduct/:id', auth(['admin', 'user']), upload.fields([{ name: 'images' }]), updateProductById)
-// indexRoutes.put('/updatePackSize/:id', auth(['admin']), updatePackSizeById)
-// indexRoutes.put('/deletePackSize/:id', auth(['admin']), deletePackSizeById)
 indexRoutes.delete('/deleteProduct/:id', auth(['admin']), deleteProductById)
+indexRoutes.get('/getProductByCategory/:id', auth(['admin', 'user']), getProductByCategory)
 
 // Product Varient Routes
 
@@ -155,5 +147,36 @@ indexRoutes.get('/getRejectOrder/:id', auth(['admin', 'user']), getRejectOrderBy
 indexRoutes.post('/createPayment', auth(['admin', 'user']), createPayment);
 indexRoutes.get('/allPayments', auth(['admin', 'user']), getAllPayments)
 indexRoutes.get('/getPayment/:id', auth(['admin', 'user']), getPaymentById)
+
+// contactus routes
+
+indexRoutes.post('/createContactUs', auth(['user']), createContactUs)
+indexRoutes.get('/allContactUs', auth(['admin']), getAllContactUs)
+indexRoutes.get('/getContactUs/:id', auth(['admin']), getContactUsById)
+indexRoutes.delete('/deleteContactUs/:id', auth(['admin']), deleteContactUsById)
+
+// FAQ Routes
+
+indexRoutes.post('/createFaq', auth(['admin']), createFaq);
+indexRoutes.get('/allFaqs', auth(['admin', 'user']), getAllFaqs)
+indexRoutes.get('/getFaq/:id', auth(['admin', 'user']), getFaqById)
+indexRoutes.put('/updateFaq/:id', auth(['admin']), updateFaqById)
+indexRoutes.delete('/deleteFaq/:id', auth(['admin']), deleteFaqById)
+
+// Terms & Condition Routes
+
+indexRoutes.post('/createTerm', auth(['admin']), createTerms)
+indexRoutes.get('/allTerms', auth(['admin', 'user']), getAllTerms)
+indexRoutes.get('/getTerms/:id', auth(['admin', 'user']), getTermsById)
+indexRoutes.put('/updateTerms/:id', auth(['admin']), updateTermsById)
+indexRoutes.delete('/deleteTerms/:id', auth(['admin']), deleteTermsAndById)
+
+// Reason For Cancellation Routes
+
+indexRoutes.post('/createReason', auth(['admin']), createReason)
+indexRoutes.get('/allReasons', auth(['admin', 'user']), getAllReasons)
+indexRoutes.get('/getReason/:id', auth(['admin', 'user']), getReasonById)
+indexRoutes.put('/updateReason/:id', auth(['admin']), updateReasonById)
+indexRoutes.delete('/deleteReason/:id', auth(['admin']), deleteReasonById)
 
 module.exports = indexRoutes;

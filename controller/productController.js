@@ -218,3 +218,43 @@ exports.deleteProductById = async (req, res) => {
         return res.statsu(500).json({ status: 500, message: error.message })
     }
 }
+
+exports.getProductByCategory = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let getProduct = await product.aggregate([
+            {
+                $match: {
+                    categoryId: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "categoryData"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productvarients',
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productVarientData"
+                }
+            }
+        ])
+
+        if (!getProduct) {
+            return res.status(404).json({ status: 404, message: "Product Not Found" })
+        }
+
+        return res.status(200).json({ status: 200, message: "Product Found SuccessFully...", data: getProduct })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, message: error.message })
+    }
+}

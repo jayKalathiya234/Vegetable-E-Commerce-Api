@@ -12,11 +12,11 @@ exports.createContactUs = async (req, res) => {
             message
         })
 
-        return res.status(200).json({ status: 200, message: "conactUs Create SuccessFully...", contactus: createContactUs })
+        return res.status(200).json({ status: 200, success: true, message: "conactUs Create SuccessFully...", contactus: createContactUs })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -26,7 +26,7 @@ exports.getAllContactUs = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedContactUs;
@@ -36,7 +36,7 @@ exports.getAllContactUs = async (req, res) => {
         let count = paginatedContactUs.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "contactUs Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "contactUs Not Found" })
         }
 
         if (page && pageSize) {
@@ -45,11 +45,11 @@ exports.getAllContactUs = async (req, res) => {
             paginatedContactUs = await paginatedContactUs.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalContactUs: count, message: "All ContactUs Found SuccessFully...", contactUs: paginatedContactUs })
+        return res.status(200).json({ status: 200, success: true, totalContactUs: count, message: "All ContactUs Found SuccessFully...", data: paginatedContactUs })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -60,14 +60,14 @@ exports.getContactUsById = async (req, res) => {
         let getContactId = await contactUs.findById(id)
 
         if (!getContactId) {
-            return res.status(404).json({ status: 404, message: "contactUs Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "contactUs Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "ContactUs Found SuccessFully...", contactUs: getContactId })
+        return res.status(200).json({ status: 200, success: true, message: "ContactUs Found SuccessFully...", contactUs: getContactId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 

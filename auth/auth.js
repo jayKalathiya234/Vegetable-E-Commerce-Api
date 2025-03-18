@@ -11,18 +11,18 @@ exports.userLogin = async (req, res) => {
         let checkEmailIsExist = await user.findOne({ email })
 
         if (!checkEmailIsExist) {
-            return res.status(409).json({ status: 409, message: "Email Not Found" })
+            return res.status(409).json({ status: 409, success: false, message: "Email Not Found" })
         }
 
         let comparePasswrod = await bcrypt.compare(password, checkEmailIsExist.password)
 
         if (!comparePasswrod) {
-            return res.status(404).json({ status: 404, message: "Password Not Match" })
+            return res.status(404).json({ status: 404, success: false, message: "Password Not Match" })
         }
 
         let token = jwt.sign({ _id: checkEmailIsExist._id }, process.env.SECRET_KEY, { expiresIn: '1D' })
 
-        return res.status(200).json({ status: 200, message: "User Login SuccessFully...", user: checkEmailIsExist, token: token })
+        return res.status(200).json({ status: 200, success: true, message: "User Login SuccessFully...", data: checkEmailIsExist, token: token })
 
     } catch (error) {
         console.log(error);
@@ -37,22 +37,22 @@ exports.emailOtpVerify = async (req, res) => {
         let checkEmailIsExist = await user.findOne({ email })
 
         if (!checkEmailIsExist) {
-            return res.status(404).json({ status: 404, message: "Email Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Email Not Found" })
         }
 
         if (checkEmailIsExist.otp != otp) {
-            return res.status(200).json({ status: 200, message: "Invalid Otp" });
+            return res.status(200).json({ status: 200, success: false, message: "Invalid Otp" });
         }
 
         checkEmailIsExist.otp = undefined
 
         await checkEmailIsExist.save()
 
-        return res.status(200).json({ status: 200, message: "Otp Verified Successfully", user: checkEmailIsExist })
+        return res.status(200).json({ status: 200, success: true, message: "Otp Verified Successfully", data: checkEmailIsExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -63,7 +63,7 @@ exports.forgotPassword = async (req, res) => {
         let chekcEmail = await user.findOne({ email })
 
         if (!chekcEmail) {
-            return res.status(404).json({ status: 404, message: "Email Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Email Not Found" })
         }
 
         const transport = await nodemailer.createTransport({
@@ -94,7 +94,7 @@ exports.forgotPassword = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -107,11 +107,11 @@ exports.resetPassword = async (req, res) => {
         let getUserId = await user.findById(id)
 
         if (!getUserId) {
-            return res.status(404).json({ status: 404, message: "User Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
         }
 
         if (newPassword !== confirmPassword) {
-            return res.status(404).json({ status: 404, message: "Password And Confirm Password Not Match" })
+            return res.status(404).json({ status: 404, success: false, message: "Password And Confirm Password Not Match" })
         }
 
         let salt = await bcrypt.genSalt(10)
@@ -119,11 +119,11 @@ exports.resetPassword = async (req, res) => {
 
         await user.findByIdAndUpdate(id, { password: hashedPassword }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Password Reset SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Password Reset SuccessFully..." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -136,17 +136,17 @@ exports.changePassword = async (req, res) => {
         let getUser = await user.findById(id)
 
         if (!getUser) {
-            return res.status(404).json({ status: 404, message: "User Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
         }
 
         let correctPassword = await bcrypt.compare(oldPassword, getUser.password)
 
         if (!correctPassword) {
-            return res.status(404).json({ status: 404, message: "Old Password Not Match" })
+            return res.status(404).json({ status: 404, success: false, message: "Old Password Not Match" })
         }
 
         if (newPassword !== confirmPassword) {
-            return res.status(404).json({ status: 404, message: "New Password And ConfirmPassword Not Match" })
+            return res.status(404).json({ status: 404, success: false, message: "New Password And ConfirmPassword Not Match" })
         }
 
         let salt = await bcrypt.genSalt(10)
@@ -154,11 +154,11 @@ exports.changePassword = async (req, res) => {
 
         await user.findByIdAndUpdate(id, { password: hasPssword }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Password Change SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Password Change SuccessFully..." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 

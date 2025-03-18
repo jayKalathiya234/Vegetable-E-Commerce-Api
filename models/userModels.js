@@ -42,6 +42,70 @@ const userSchema = mongoose.Schema({
     type: String,
     enum: ["admin", "user"],
     require: true
+  },
+  gstNumber: {
+    type: String,
+    require: true
+  },
+  businessName: {
+    type: String,
+    require: true
+  },
+  PANNumber: {
+    type: String,
+    require: true
+  },
+  businessAddress: {
+    type: String,
+    require: true
+  },
+  businessType: {
+    type: String,
+    require: true
+  },
+  storeName: {
+    type: String,
+    require: true
+  },
+  ownerName: {
+    type: String,
+    require: true
+  },
+  accountNumber: {
+    type: String,
+    require: true
+  },
+  confirmAccount: {
+    type: String,
+    require: true
+  },
+  IFSCCode: {
+    type: String,
+    require: true
+  },
+  buildingNumber: {
+    type: String,
+    require: true
+  },
+  locality: {
+    type: String,
+    require: true
+  },
+  landmark: {
+    type: String,
+    require: true
+  },
+  pincode: {
+    type: String,
+    require: true
+  },
+  city: {
+    type: String,
+    require: true
+  },
+  state: {
+    type: String,
+    require: true
   }
 }, {
   timestamps: true,

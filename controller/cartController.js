@@ -11,7 +11,7 @@ exports.createCart = async (req, res) => {
             checkExistCartProduct.quantity += quantity
             await checkExistCartProduct.save()
 
-            return res.status(409).json({ status: 409, message: "Card Already Exist" })
+            return res.status(409).json({ status: 409, success: false, message: "Card Already Exist" })
         }
 
         checkExistCartProduct = await cart.create({
@@ -21,11 +21,11 @@ exports.createCart = async (req, res) => {
             quantity
         });
 
-        return res.status(201).json({ status: 201, message: "Card Created SuccessFully...", card: checkExistCartProduct })
+        return res.status(201).json({ status: 201, success: true, message: "Card Created SuccessFully...", data: checkExistCartProduct })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -35,7 +35,7 @@ exports.getAllCarts = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedCarts;
@@ -62,7 +62,7 @@ exports.getAllCarts = async (req, res) => {
         let count = paginatedCarts.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Cart Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Not Found" })
         }
 
         if (page && pageSize) {
@@ -71,7 +71,7 @@ exports.getAllCarts = async (req, res) => {
             paginatedCarts = await paginatedCarts.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalCarts: count, message: 'All Carts Found SuccessFully...', carts: paginatedCarts })
+        return res.status(200).json({ status: 200, success: true, totalCarts: count, message: 'All Carts Found SuccessFully...', data: paginatedCarts })
 
     } catch (error) {
         console.log(error)
@@ -108,10 +108,10 @@ exports.getCartsById = async (req, res) => {
         ])
 
         if (!getCartId) {
-            return res.status(404).json({ status: 404, message: "Cart Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Cart Found SuccessFully...", cart: getCartId })
+        return res.status(200).json({ status: 200, success: true, message: "Cart Found SuccessFully...", data: getCartId })
 
     } catch (error) {
         console.log(error)
@@ -126,16 +126,16 @@ exports.updateCartsById = async (req, res) => {
         let updateCartId = await cart.findById(id)
 
         if (!updateCartId) {
-            return res.status(404).json({ status: 404, message: "Cart Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Not Found" })
         }
 
         updateCartId = await cart.findByIdAndUpdate(id, { ...req.body }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Cart Update SuccessFully...", cart: updateCartId })
+        return res.status(200).json({ status: 200, success: true, message: "Cart Update SuccessFully...", data: updateCartId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -146,16 +146,16 @@ exports.deleteCartById = async (req, res) => {
         let deleteCartId = await cart.findById(id)
 
         if (!deleteCartId) {
-            return res.status(404).json({ status: 404, message: "Cart Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Not Found" })
         }
 
         await cart.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Cart Delete SuccessFully...." })
+        return res.status(200).json({ status: 200, success: true, message: "Cart Delete SuccessFully...." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -165,7 +165,7 @@ exports.getAllMyCarts = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedMyCarts;
@@ -197,7 +197,7 @@ exports.getAllMyCarts = async (req, res) => {
         let count = paginatedMyCarts.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Cart Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Not Found" })
         }
 
         if (page && pageSize) {
@@ -206,10 +206,10 @@ exports.getAllMyCarts = async (req, res) => {
             paginatedMyCarts = await paginatedMyCarts.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalMyCart: count, message: "All My Carts Found SuccessFully...", cart: paginatedMyCarts })
+        return res.status(200).json({ status: 200, success: true, totalMyCart: count, message: "All My Carts Found SuccessFully...", data: paginatedMyCarts })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

@@ -1,5 +1,8 @@
 const user = require("../models/userModels");
 const bcrypt = require('bcrypt')
+const Category = require('../models/categoryModels')
+const Product = require('../models/productModels')
+const ProductVariant = require('../models/productVarientModels')
 const nodemailer = require('nodemailer')
 let otp = 123456
 
@@ -201,5 +204,277 @@ exports.deleteUserById = async (req, res) => {
   } catch (error) {
     console.log(error)
     return res.status(500).json({ status: 500, message: error.message })
+  }
+}
+
+otp = 456789
+
+exports.setGstNumber = async (req, res) => {
+  try {
+    let id = req.user._id
+
+    let { gstNumber, businessName, PANNumber, businessType, businessAddress } = req.body
+
+    let findUser = await user.findById(id)
+
+    if (!findUser) {
+      return res.status(404).json({ status: 404, message: "User Not Found" })
+    }
+
+    findUser.gstNumber = gstNumber
+    findUser.businessName = businessName
+    findUser.PANNumber = PANNumber
+    findUser.businessType = businessType
+    findUser.businessAddress = businessAddress
+    findUser.otp = otp
+
+    await findUser.save()
+
+
+    const transport = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: findUser.email,
+      subject: "Email Verification Code",
+      text: `Your code is: ${otp} `
+    }
+
+    transport.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+      }
+    })
+
+    return res.status(200).json({ status: 200, message: "Gst Number added SuccessFully...", user: findUser })
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, message: error.message })
+  }
+}
+
+exports.createBrandDetails = async (req, res) => {
+  try {
+    let id = req.user._id
+
+    let getUserData = await user.findById(id)
+
+    let { storeName, ownerName } = req.body
+    if (!getUserData) {
+      return res.status(404).json({ status: 404, message: "User Not Found" })
+    }
+
+    getUserData.storeName = storeName
+    getUserData.ownerName = ownerName
+
+    await getUserData.save()
+
+    return res.status(200).json({ status: 200, message: "Brand Details Set SuccessFully...", user: getUserData })
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ status: 500, message: error.message })
+  }
+}
+
+exports.setBankDetails = async (req, res) => {
+  try {
+    let id = req.user._id
+
+    let { accountNumber, confirmAccount, IFSCCode } = req.body
+
+    let getUserData = await user.findById(id)
+
+    if (!getUserData) {
+      return res.status(404).json({ status: 404, message: "User Not Found" })
+    }
+
+    getUserData.accountNumber = accountNumber
+    getUserData.confirmAccount = confirmAccount
+    getUserData.IFSCCode = IFSCCode
+
+    await getUserData.save()
+
+    return res.status(200).json({ status: 200, message: "Bank Details Set SuccessFully...", user: getUserData })
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, message: error.message })
+  }
+}
+
+exports.pickUpAddress = async (req, res) => {
+  try {
+    let id = req.user._id
+
+    let { buildingNumber, locality, landmark, pincode, city, state } = req.body
+
+    let getUserData = await user.findById(id)
+
+    if (!getUserData) {
+      return res.status(404).json({ status: 404, message: "User Not Found" })
+    }
+
+    getUserData.buildingNumber = buildingNumber
+    getUserData.locality = locality
+    getUserData.landmark = landmark
+    getUserData.pincode = pincode
+    getUserData.city = city
+    getUserData.state = state
+
+    await getUserData.save()
+
+    return res.status(200).json({ status: 200, message: "Pickup Address Set SuccessFully...", user: getUserData })
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ status: 500, message: error.message })
+  }
+}
+
+exports.userDasboard = async (req, res) => {
+  try {
+    const categories = await Category.find({ status: true });
+
+    const gardenFresh = await Product.aggregate([
+      { $limit: 6 },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'productvariants',
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'variants'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          description: 1,
+          healthBenefits: 1,
+          storageAndUses: 1,
+          images: 1,
+          category: 1,
+          variants: 1,
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }
+    ]);
+
+    const seasonalSelections = await Product.aggregate([
+      { $skip: 6 },
+      { $limit: 6 },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'productvariants',
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'variants'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          description: 1,
+          healthBenefits: 1,
+          storageAndUses: 1,
+          images: 1,
+          category: 1,
+          variants: 1,
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }
+    ]);
+
+    const specialOffers = await ProductVariant.aggregate([
+      {
+        $match: {
+          $expr: { $lt: ["$price", "$discountPrice"] }
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productId',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'product.categoryId',
+          foreignField: '_id',
+          as: 'product.category'
+        }
+      },
+      { $unwind: { path: '$product.category', preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: '$productId',
+          product: { $first: '$product' },
+          variants: { $push: '$$ROOT' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          _id: '$product._id',
+          productName: '$product.productName',
+          description: '$product.description',
+          healthBenefits: '$product.healthBenefits',
+          storageAndUses: '$product.storageAndUses',
+          images: '$product.images',
+          category: '$product.category',
+          variants: 1,
+          createdAt: '$product.createdAt',
+          updatedAt: '$product.updatedAt'
+        }
+      },
+      { $limit: 8 }
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        categories,
+        gardenFresh,
+        seasonalSelections,
+        specialOffers
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, success: false, message: error.message });
   }
 }

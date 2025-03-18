@@ -9,13 +9,13 @@ exports.createCancelOrder = async (req, res) => {
         let checkCancelOrderIsExist = await cancelOrder.findOne({ orderId })
 
         if (checkCancelOrderIsExist) {
-            return res.status(409).json({ status: 409, message: "Order Is Already Cancelled" })
+            return res.status(409).json({ status: 409, success: false, message: "Order Is Already Cancelled" })
         }
 
         let getOrderData = await order.findById(orderId)
 
         if (!getOrderData) {
-            return res.status(404).json({ status: 404, message: "Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
         checkCancelOrderIsExist = await cancelOrder.create({
@@ -28,11 +28,11 @@ exports.createCancelOrder = async (req, res) => {
 
         await getOrderData.save();
 
-        return res.status(201).json({ status: 201, message: "Order Cancelled SuccessFully...", cancelOrder: checkCancelOrderIsExist })
+        return res.status(201).json({ status: 201, success: true, message: "Order Cancelled SuccessFully...", data: checkCancelOrderIsExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -42,7 +42,7 @@ exports.getAllCancelOrder = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedCancelOrder;
@@ -69,7 +69,7 @@ exports.getAllCancelOrder = async (req, res) => {
         let count = paginatedCancelOrder.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Cancel Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cancel Order Not Found" })
         }
 
         if (page && pageSize) {
@@ -78,11 +78,11 @@ exports.getAllCancelOrder = async (req, res) => {
             paginatedCancelOrder = await paginatedCancelOrder.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalCancelOrders: count, message: "All Cancel Order Found SuccessFully...", order: paginatedCancelOrder })
+        return res.status(200).json({ status: 200, success: true, totalCancelOrders: count, message: "All Cancel Order Found SuccessFully...", data: paginatedCancelOrder })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -115,13 +115,13 @@ exports.getCancelOrderById = async (req, res) => {
         ])
 
         if (!getCancelOrderId) {
-            return res.status(404).json({ status: 404, message: "Cancel Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cancel Order Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Cancel Order Found SuccessFully...", order: getCancelOrderId })
+        return res.status(200).json({ status: 200, success: true, message: "Cancel Order Found SuccessFully...", data: getCancelOrderId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
