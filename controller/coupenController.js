@@ -7,7 +7,7 @@ exports.createCoupen = async (req, res) => {
         let checkCoupenIsExist = await coupen.findOne({ title: title })
 
         if (checkCoupenIsExist) {
-            return res.status(409).json({ status: 409, message: "Coupen Alredy Exist" })
+            return res.status(409).json({ status: 409, success: false, message: "Coupen Alredy Exist" })
         }
 
         checkCoupenIsExist = await coupen.create({
@@ -19,11 +19,11 @@ exports.createCoupen = async (req, res) => {
             endDate
         });
 
-        return res.status(200).json({ status: 200, message: "Coupen Create SuccessFully...", coupen: checkCoupenIsExist })
+        return res.status(200).json({ status: 200, success: true, message: "Coupen Create SuccessFully...", data: checkCoupenIsExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -33,7 +33,7 @@ exports.getAllCoupens = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedCoupens;
@@ -43,7 +43,7 @@ exports.getAllCoupens = async (req, res) => {
         let count = paginatedCoupens.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Coupen Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Coupen Not Found" })
         }
 
         if (page && pageSize) {
@@ -52,11 +52,11 @@ exports.getAllCoupens = async (req, res) => {
             paginatedCoupens = await paginatedCoupens.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalCoupens: count, message: "All Coupens Found SuccessFully...", coupens: paginatedCoupens })
+        return res.status(200).json({ status: 200, success: true, totalCoupens: count, message: "All Coupens Found SuccessFully...", data: paginatedCoupens })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -67,14 +67,14 @@ exports.getCoupenById = async (req, res) => {
         let getCoupenId = await coupen.findById(id)
 
         if (!getCoupenId) {
-            return res.status(404).json({ status: 404, message: "Coupen Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Coupen Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Coupen Found SuccessFully...", coupen: getCoupenId })
+        return res.status(200).json({ status: 200, success: true, message: "Coupen Found SuccessFully...", data: getCoupenId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -85,16 +85,16 @@ exports.updateCoupenById = async (req, res) => {
         let updateCoupenId = await coupen.findById(id)
 
         if (!updateCoupenId) {
-            return res.status(404).json({ status: 404, message: "Coupen Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Coupen Not Found" })
         }
 
         updateCoupenId = await coupen.findByIdAndUpdate(id, { ...req.body }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Coupen Updated SuccessFully...", coupen: updateCoupenId })
+        return res.status(200).json({ status: 200, success: true, message: "Coupen Updated SuccessFully...", data: updateCoupenId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -105,15 +105,15 @@ exports.deleteCoupenById = async (req, res) => {
         let deleteCoupenId = await coupen.findById(id)
 
         if (!deleteCoupenId) {
-            return res.status(404).json({ status: 404, message: "Coupen Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Coupen Not Found" })
         }
 
         await coupen.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Coupen Deleted SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Coupen Deleted SuccessFully..." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

@@ -12,7 +12,7 @@ exports.createContactUs = async (req, res) => {
             message
         })
 
-        return res.status(200).json({ status: 200, success: true, message: "conactUs Create SuccessFully...", contactus: createContactUs })
+        return res.status(200).json({ status: 200, success: true, message: "conactUs Create SuccessFully...", data: createContactUs })
 
     } catch (error) {
         console.log(error)
@@ -63,7 +63,7 @@ exports.getContactUsById = async (req, res) => {
             return res.status(404).json({ status: 404, success: false, message: "contactUs Not Found" })
         }
 
-        return res.status(200).json({ status: 200, success: true, message: "ContactUs Found SuccessFully...", contactUs: getContactId })
+        return res.status(200).json({ status: 200, success: true, message: "ContactUs Found SuccessFully...", data: getContactId })
 
     } catch (error) {
         console.log(error)
@@ -78,15 +78,15 @@ exports.deleteContactUsById = async (req, res) => {
         let deleteContactUsId = await contactUs.findById(id)
 
         if (!deleteContactUsId) {
-            return res.status(404).json({ status: 404, message: "ContactUs Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "ContactUs Not Found" })
         }
 
         await contactUs.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: 'contactUs Delete successFully...' })
+        return res.status(200).json({ status: 200, success: true, message: 'contactUs Delete successFully...' })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

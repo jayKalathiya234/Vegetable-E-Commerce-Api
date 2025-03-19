@@ -53,7 +53,7 @@ exports.getAllAddress = async (req, res) => {
         let count = paginatedAddress.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, success: false, message: "No Address Found..." })
+            return res.status(404).json({ status: 404, success: false, message: "No Address Found" })
         }
 
         if (page && pageSize) {
