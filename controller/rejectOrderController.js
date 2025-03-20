@@ -9,13 +9,13 @@ exports.createRejectOrder = async (req, res) => {
         let checkRejectOrderisExist = await rejectOrder.findOne({ orderId })
 
         if (checkRejectOrderisExist) {
-            return res.status(409).json({ status: 409, message: "Order Is Already Rejected" })
+            return res.status(409).json({ status: 409, success: false, message: "Order Is Already Rejected" })
         }
 
         let getOrderDetails = await order.findById(orderId)
 
         if (!getOrderDetails) {
-            return res.status(404).json({ status: 404, message: "Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
         checkRejectOrderisExist = await rejectOrder.create({
@@ -27,11 +27,11 @@ exports.createRejectOrder = async (req, res) => {
         getOrderDetails.orderStatus = 'Cancelled'
         await getOrderDetails.save()
 
-        return res.status(201).json({ status: 201, message: "Order Created SuccessFully...", rejectOrder: checkRejectOrderisExist })
+        return res.status(201).json({ status: 201, success: true, message: "Order Created SuccessFully...", data: checkRejectOrderisExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -41,7 +41,7 @@ exports.getAllRejectOrders = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedRejectOrder;
@@ -68,7 +68,7 @@ exports.getAllRejectOrders = async (req, res) => {
         let count = paginatedRejectOrder.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Reject Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Reject Order Not Found" })
         }
 
         if (page && pageSize) {
@@ -77,11 +77,11 @@ exports.getAllRejectOrders = async (req, res) => {
             paginatedRejectOrder = await paginatedRejectOrder.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalRejectOder: count, message: "All Rejectd Order Found SuccessFully...", rejectedOrders: paginatedRejectOrder })
+        return res.status(200).json({ status: 200, success: true, totalRejectOder: count, message: "All Rejectd Order Found SuccessFully...", data: paginatedRejectOrder })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -114,13 +114,13 @@ exports.getRejectOrderById = async (req, res) => {
         ])
 
         if (!getRejectOrderId) {
-            return res.status(404).json({ status: 404, message: "Reject Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Reject Order Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Reject Order Found SuccessFully...", rejectOrder: getRejectOrderId })
+        return res.status(200).json({ status: 200, success: true, message: "Reject Order Found SuccessFully...", data: getRejectOrderId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

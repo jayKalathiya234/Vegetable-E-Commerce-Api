@@ -7,7 +7,7 @@ exports.createStock = async (req, res) => {
         let checkStockProductIsExist = await stock.findOne({ categoryId, productId })
 
         if (checkStockProductIsExist) {
-            return res.status(409).json({ status: 409, message: "Stock Product Already Exist" })
+            return res.status(409).json({ status: 409, success: false, message: "Stock Product Already Exist" })
         }
 
         checkStockProductIsExist = await stock.create({
@@ -17,11 +17,11 @@ exports.createStock = async (req, res) => {
             lowStockLimit
         });
 
-        return res.status(200).json({ status: 200, message: "Stock Product Created Successfully", stock: checkStockProductIsExist })
+        return res.status(200).json({ status: 200, success: true, message: "Stock Product Created Successfully", data: checkStockProductIsExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -31,7 +31,7 @@ exports.getAllStocks = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedStocks;
@@ -41,7 +41,7 @@ exports.getAllStocks = async (req, res) => {
         let count = paginatedStocks.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Stock Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Stock Not Found" })
         }
 
         if (page && pageSize) {
@@ -50,11 +50,11 @@ exports.getAllStocks = async (req, res) => {
             paginatedStocks = await paginatedStocks.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalStocks: count, message: "All Stocks Found SuccessFully...", stock: paginatedStocks })
+        return res.status(200).json({ status: 200, success: true, totalStocks: count, message: "All Stocks Found SuccessFully...", data: paginatedStocks })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -65,14 +65,14 @@ exports.getStockById = async (req, res) => {
         let getStockId = await stock.findById(id)
 
         if (!getStockId) {
-            return res.status(404).json({ status: 404, message: "Stock Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Stock Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Stock Found SuccessFully...", stock: getStockId })
+        return res.status(200).json({ status: 200, success: true, message: "Stock Found SuccessFully...", data: getStockId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -83,16 +83,16 @@ exports.updateStockById = async (req, res) => {
         let updateStockId = await stock.findById(id)
 
         if (!updateStockId) {
-            return res.status(404).json({ status: 404, message: "Stock Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Stock Not Found" })
         }
 
         updateStockId = await stock.findByIdAndUpdate(id, { ...req.body }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Stock Updated SuccessFully...", stock: updateStockId })
+        return res.status(200).json({ status: 200, success: true, message: "Stock Updated SuccessFully...", data: updateStockId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -103,15 +103,15 @@ exports.deleteStockById = async (req, res) => {
         let deleteStockId = await stock.findById(id)
 
         if (!deleteStockId) {
-            return res.status(404).json({ status: 404, message: "Stock Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Stock Not Found" })
         }
 
         await stock.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Stock Deleted SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Stock Deleted SuccessFully..." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

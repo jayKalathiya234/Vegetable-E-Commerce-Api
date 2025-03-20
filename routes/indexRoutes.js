@@ -65,7 +65,7 @@ indexRoutes.delete('/deleteUser', auth(['admin', 'user']), deleteUserById)
 // category Routes
 
 indexRoutes.post('/createCategory', auth(['admin']), upload.single('categoryImage'), createCategory)
-indexRoutes.get('/allCategory', auth(['admin', 'user']), getAllCategory)
+indexRoutes.get('/allCategory', getAllCategory)
 indexRoutes.get('/getCategory/:id', auth(['admin', 'user']), getCategoryById)
 indexRoutes.put('/updateCategory/:id', auth(['admin']), upload.single('categoryImage'), updateCategoryById)
 indexRoutes.delete('/deleteCategory/:id', auth(['admin']), deleteCategoryById)
@@ -82,16 +82,16 @@ indexRoutes.get('/allMyAddress', auth(['admin', 'user']), getAllMyAddress)
 // product Routes
 
 indexRoutes.post('/createProduct', auth(['admin', 'user']), upload.fields([{ name: 'images' }]), createProduct)
-indexRoutes.get('/allProducts', auth(['admin', 'user']), getAllProducts)
+indexRoutes.get('/allProducts', getAllProducts)
 indexRoutes.get('/getProduct/:id', auth(['admin', 'user']), getProductById)
 indexRoutes.put('/updateProduct/:id', auth(['admin', 'user']), upload.fields([{ name: 'images' }]), updateProductById)
 indexRoutes.delete('/deleteProduct/:id', auth(['admin']), deleteProductById)
-indexRoutes.get('/getProductByCategory/:id', auth(['admin', 'user']), getProductByCategory)
+indexRoutes.get('/getProductByCategory/:id', getProductByCategory)
 
 // Product Varient Routes
 
 indexRoutes.post('/createProductVarient', auth(['admin']), createProductVarient)
-indexRoutes.get('/allProductVarient', auth(['admin', 'user']), getAllProductVarient)
+indexRoutes.get('/allProductVarient', getAllProductVarient)
 indexRoutes.get('/getProductVarient/:id', auth(['admin', 'user']), getProductVarientById)
 indexRoutes.put('/updateProductVarient/:id', auth(['admin']), updateProductVarientById)
 indexRoutes.delete('/deleteProductVarient/:id', auth(['admin']), deleteProductVarientById)
@@ -107,19 +107,19 @@ indexRoutes.get('/allMyCarts', auth(['admin', 'user']), getAllMyCarts)
 
 // Coupen Routes
 
-indexRoutes.post('/createCoupen', auth(['admin', 'user']), createCoupen)
+indexRoutes.post('/createCoupen', auth(['admin']), createCoupen)
 indexRoutes.get('/allCoupens', auth(['admin', 'user']), getAllCoupens)
 indexRoutes.get('/getCoupen/:id', auth(['admin', 'user']), getCoupenById)
-indexRoutes.put('/updateCoupen/:id', auth(['admin', 'user']), updateCoupenById)
-indexRoutes.delete('/deleteCoupen/:id', auth(['admin', 'user']), deleteCoupenById)
+indexRoutes.put('/updateCoupen/:id', auth(['admin']), updateCoupenById)
+indexRoutes.delete('/deleteCoupen/:id', auth(['admin']), deleteCoupenById)
 
 // Order Routes
 
 indexRoutes.post('/createOrder', auth(['admin', 'user']), createOrder)
-indexRoutes.get('/allOrders', auth(['admin', 'user']), getAllOrders)
+indexRoutes.get('/allOrders', auth(['admin']), getAllOrders)
 indexRoutes.get('/getOrder/:id', auth(['admin', 'user']), getOrderById)
 indexRoutes.put('/updateOrderStatus/:id', auth(['admin', 'user']), updateOrderStatusById)
-indexRoutes.delete('/deleteOrder/:id', auth(['admin', 'user']), deleteOrderById)
+indexRoutes.delete('/deleteOrder/:id', auth(['admin']), deleteOrderById)
 indexRoutes.get('/allMyOrders', auth(['admin', 'user']), getAllMyOrders)
 
 // Cancel Order Roues
@@ -138,9 +138,9 @@ indexRoutes.delete('/deleteStock/:id', auth(['admin']), deleteStockById)
 
 // Reject Order 
 
-indexRoutes.post('/rejectOrder', auth(['admin', 'user']), createRejectOrder)
-indexRoutes.get('/allRejectedOrders', auth(['admin', 'user']), getAllRejectOrders)
-indexRoutes.get('/getRejectOrder/:id', auth(['admin', 'user']), getRejectOrderById)
+indexRoutes.post('/rejectOrder', auth(['admin']), createRejectOrder)
+indexRoutes.get('/allRejectedOrders', auth(['admin']), getAllRejectOrders)
+indexRoutes.get('/getRejectOrder/:id', auth(['admin']), getRejectOrderById)
 
 // Payment Routes
 
@@ -150,7 +150,7 @@ indexRoutes.get('/getPayment/:id', auth(['admin', 'user']), getPaymentById)
 
 // contactus routes
 
-indexRoutes.post('/createContactUs', auth(['user']), createContactUs)
+indexRoutes.post('/createContactUs', createContactUs)
 indexRoutes.get('/allContactUs', auth(['admin']), getAllContactUs)
 indexRoutes.get('/getContactUs/:id', auth(['admin']), getContactUsById)
 indexRoutes.delete('/deleteContactUs/:id', auth(['admin']), deleteContactUsById)

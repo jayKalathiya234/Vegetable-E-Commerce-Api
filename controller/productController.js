@@ -8,11 +8,11 @@ exports.createProduct = async (req, res) => {
         let checkProductNameIsExist = await product.findOne({ productName })
 
         if (checkProductNameIsExist) {
-            return res.status(409).json({ status: 409, message: "ProductName already exist" })
+            return res.status(409).json({ status: 409, success: false, message: "ProductName already exist" })
         }
 
         if (!req.files) {
-            return res.status(403).json({ status: 403, message: "Image Filed Is required" })
+            return res.status(403).json({ status: 403, success: false, message: "Image Filed Is required" })
         }
 
         checkProductNameIsExist = await product.create({
@@ -24,11 +24,11 @@ exports.createProduct = async (req, res) => {
             images: req.files['images'].map(file => file.path)
         })
 
+        return res.status(201).json({ status: 201, success: true, message: "Product Create successFully....", data: checkProductNameIsExist })
 
-        return res.status(201).json({ status: 201, message: "Product Create successFully....", product: checkProductNameIsExist })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -38,7 +38,7 @@ exports.getAllProducts = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedProducts = await product.aggregate([
@@ -63,7 +63,7 @@ exports.getAllProducts = async (req, res) => {
         let count = paginatedProducts.length
 
         if (count === 0) {
-            return res.statsu(404).json({ status: 404, message: "Product Not Found" })
+            return res.statsu(404).json({ status: 404, success: false, message: "Product Not Found" })
         }
 
         if (page && pageSize) {
@@ -72,11 +72,11 @@ exports.getAllProducts = async (req, res) => {
             paginatedProducts = await paginatedProducts.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalProducts: count, message: "All Products Found SuccessFully...", products: paginatedProducts })
+        return res.status(200).json({ status: 200, success: true, totalProducts: count, message: "All Products Found SuccessFully...", data: paginatedProducts })
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -109,14 +109,14 @@ exports.getProductById = async (req, res) => {
         ])
 
         if (!getProductId) {
-            return res.status(404).json({ status: 404, message: "Product Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Product Found SuccessFully...", product: getProductId })
+        return res.status(200).json({ status: 200, success: true, message: "Product Found SuccessFully...", data: getProductId })
 
     } catch (error) {
         console.log(error)
-        return res.statsu(500).json({ status: 500, message: error.message })
+        return res.statsu(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -127,7 +127,7 @@ exports.updateProductById = async (req, res) => {
         let updateProductId = await product.findById(id)
 
         if (!updateProductId) {
-            return res.status(404).json({ status: 404, message: "Product Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Not Found" })
         }
 
         if (req.files) {
@@ -136,68 +136,13 @@ exports.updateProductById = async (req, res) => {
 
         updateProductId = await product.findByIdAndUpdate(id, { ...req.body }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Product Found SuccessFully...", product: updateProductId })
+        return res.status(200).json({ status: 200, success: true, message: "Product Found SuccessFully...", data: updateProductId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
-
-// exports.updatePackSizeById = async (req, res) => {
-//     try {
-//         let id = req.params.id
-//         let { size, price, discountPrice, stockStatus } = req.body
-
-//         let getPackSize = await product.findOne({ "packSizes._id": id })
-
-//         if (!getPackSize) {
-//             return res.status(404).json({ status: 404, message: "Product Not Found" })
-//         }
-
-//         getPackSize = await product.findOneAndUpdate(
-//             { 'packSizes._id': id }, {
-//             $set: {
-//                 "packSizes.$.size": size,
-//                 "packSizes.$.price": price,
-//                 "packSizes.$.discountPrice": discountPrice,
-//                 "packSizes.$.stockStatus": stockStatus
-//             }
-//         },
-//             { new: true }
-//         )
-
-//         return res.status(200).json({ status: 200, message: "Pack size updated successfully", produc: getPackSize });
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({ statsu: 500, message: error.message })
-//     }
-// }
-
-// exports.deletePackSizeById = async (req, res) => {
-//     try {
-//         let id = req.params.id
-
-//         let deletePackSizeId = await product.findOne({ "packSizes._id": id })
-
-//         if (!deletePackSizeId) {
-//             return res.status(404).json({ status: 404, message: "Product Not Found" })
-//         }
-
-//         deletePackSizeId = await product.findOneAndUpdate(
-//             { "packSizes._id": id },
-//             { $pull: { packSizes: { _id: id } } },
-//             { new: true }
-//         );
-
-//         return res.status(200).json({ status: 200, message: "packSize Delete SuccessFully...", product: deletePackSizeId })
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({ status: 500, message: error.message })
-//     }
-// }
 
 exports.deleteProductById = async (req, res) => {
     try {
@@ -206,16 +151,16 @@ exports.deleteProductById = async (req, res) => {
         let deleteProductId = await product.findById(id)
 
         if (!deleteProductId) {
-            return res.status(404).json({ status: 404, message: "Product Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Not Found" })
         }
 
         await product.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Product Found SuccesssFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Product Found SuccesssFully..." })
 
     } catch (error) {
         console.log(error);
-        return res.statsu(500).json({ status: 500, message: error.message })
+        return res.statsu(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -248,13 +193,13 @@ exports.getProductByCategory = async (req, res) => {
         ])
 
         if (!getProduct) {
-            return res.status(404).json({ status: 404, message: "Product Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Product Found SuccessFully...", data: getProduct })
+        return res.status(200).json({ status: 200, success: true, message: "Product Found SuccessFully...", data: getProduct })
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

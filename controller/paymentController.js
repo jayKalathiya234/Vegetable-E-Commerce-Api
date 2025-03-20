@@ -9,13 +9,13 @@ exports.createPayment = async (req, res) => {
         let checkPaymentIsExist = await payment.findOne({ orderId })
 
         if (checkPaymentIsExist) {
-            return res.status(409).json({ status: 409, message: "Payment is already exist" })
+            return res.status(409).json({ status: 409, success: false, message: "Payment is already exist" })
         }
 
         let getOrderId = await order.findById(orderId)
 
         if (!getOrderId) {
-            return res.status(404).json({ status: 404, message: "Order not found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order not found" })
         }
 
         checkPaymentIsExist = await payment.create({
@@ -27,11 +27,11 @@ exports.createPayment = async (req, res) => {
 
         await getOrderId.save()
 
-        return res.status(201).json({ status: 201, message: "Payment Created SuccessFully...", payment: checkPaymentIsExist })
+        return res.status(201).json({ status: 201, success: true, message: "Payment Created SuccessFully...", data: checkPaymentIsExist })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -41,7 +41,7 @@ exports.getAllPayments = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedPayments;
@@ -60,7 +60,7 @@ exports.getAllPayments = async (req, res) => {
         let count = paginatedPayments.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Payment Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Payment Not Found" })
         }
 
         if (page && pageSize) {
@@ -69,11 +69,11 @@ exports.getAllPayments = async (req, res) => {
             paginatedPayments = await paginatedPayments.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalPayments: count, message: "Get All Payments Found SuccessFully...", payment: paginatedPayments })
+        return res.status(200).json({ status: 200, success: true, totalPayments: count, message: "Get All Payments Found SuccessFully...", data: paginatedPayments })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -98,13 +98,13 @@ exports.getPaymentById = async (req, res) => {
         ])
 
         if (!getPaymentId) {
-            return res.status(404).json({ status: 404, message: "Payment Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Payment Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Payment Found SuccessFully...", payment: getPaymentId })
+        return res.status(200).json({ status: 200, success: true, message: "Payment Found SuccessFully...", data: getPaymentId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }

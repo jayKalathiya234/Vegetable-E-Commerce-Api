@@ -13,7 +13,7 @@ exports.createAdminUser = async (req, res) => {
     let checkUserIsExist = await user.findOne({ email });
 
     if (checkUserIsExist) {
-      return res.status(409).json({ status: 409, message: "User Is Already Exist" });
+      return res.status(409).json({ status: 409, success: false, message: "User Is Already Exist" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -50,11 +50,11 @@ exports.createAdminUser = async (req, res) => {
       }
     })
 
-    return res.status(201).json({ status: 201, message: "Admin Create SuccessFully...", user: checkUserIsExist });
+    return res.status(201).json({ status: 201, success: true, message: "Admin Create SuccessFully...", data: checkUserIsExist });
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ status: 500, message: error.message });
+    return res.status(500).json({ status: 500, success: false, message: error.message });
   }
 }
 
@@ -65,9 +65,7 @@ exports.createUser = async (req, res) => {
     let checkUserIsExist = await user.findOne({ email });
 
     if (checkUserIsExist) {
-      return res
-        .status(409)
-        .json({ status: 409, message: "User Is Already Exist" });
+      return res.status(409).json({ status: 409, success: false, message: "User Is Already Exist" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -118,7 +116,7 @@ exports.getAllUsers = async (req, res) => {
     let pageSize = parseInt(req.query.pageSize)
 
     if (page < 1 || pageSize < 1) {
-      return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+      return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
     }
 
     let paginatedUsers;
@@ -127,8 +125,9 @@ exports.getAllUsers = async (req, res) => {
 
     let count = paginatedUsers.length
 
+
     if (count === 0) {
-      return res.status(404).json({ status: 404, message: "user not found" })
+      return res.status(404).json({ status: 404, success: false, message: "user not found" })
     }
 
     if (page && pageSize) {
@@ -137,11 +136,11 @@ exports.getAllUsers = async (req, res) => {
       paginatedUsers = await paginatedUsers.slice(startIndex, lastIndex)
     }
 
-    return res.status(200).json({ status: 200, totalUsers: count, message: "All Users Found SuccessFully...", users: paginatedUsers });
+    return res.status(200).json({ status: 200, success: true, totalUsers: count, message: "All Users Found SuccessFully...", data: paginatedUsers });
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message });
+    return res.status(500).json({ status: 500, success: false, message: error.message });
   }
 }
 
@@ -152,14 +151,14 @@ exports.getUserById = async (req, res) => {
     let getUserId = await user.findById(id)
 
     if (!getUserId) {
-      return res.status(404).json({ status: 404, message: "User Not Found" })
+      return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
     }
 
-    return res.status(200).json({ status: 200, message: "user found successFully...", user: getUserId })
+    return res.status(200).json({ status: 200, success: true, message: "user found successFully...", data: getUserId })
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -170,7 +169,7 @@ exports.updateUserById = async (req, res) => {
     let updateUserId = await user.findById(id)
 
     if (!updateUserId) {
-      return res.status(404).json({ status: 404, message: "user not found" })
+      return res.status(404).json({ status: 404, success: false, message: "user not found" })
     }
 
     if (req.file) {
@@ -179,11 +178,11 @@ exports.updateUserById = async (req, res) => {
 
     updateUserId = await user.findByIdAndUpdate(id, { ...req.body }, { new: true });
 
-    return res.status(200).json({ status: 200, message: "user updated successfully...", user: updateUserId })
+    return res.status(200).json({ status: 200, success: true, message: "user updated successfully...", data: updateUserId })
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -194,16 +193,16 @@ exports.deleteUserById = async (req, res) => {
     let deleteUserId = await user.findById(id)
 
     if (!deleteUserId) {
-      return res.status(404).json({ status: 404, message: "user not found" })
+      return res.status(404).json({ status: 404, success: false, message: "user not found" })
     }
 
     await user.findByIdAndDelete(id)
 
-    return res.status(200).json({ status: 200, message: "user delete successfully..." })
+    return res.status(200).json({ status: 200, success: true, message: "user delete successfully..." })
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -218,7 +217,7 @@ exports.setGstNumber = async (req, res) => {
     let findUser = await user.findById(id)
 
     if (!findUser) {
-      return res.status(404).json({ status: 404, message: "User Not Found" })
+      return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
     }
 
     findUser.gstNumber = gstNumber
@@ -253,11 +252,11 @@ exports.setGstNumber = async (req, res) => {
       }
     })
 
-    return res.status(200).json({ status: 200, message: "Gst Number added SuccessFully...", user: findUser })
+    return res.status(200).json({ status: 200, success: true, message: "Gst Number added SuccessFully...", data: findUser })
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -269,7 +268,7 @@ exports.createBrandDetails = async (req, res) => {
 
     let { storeName, ownerName } = req.body
     if (!getUserData) {
-      return res.status(404).json({ status: 404, message: "User Not Found" })
+      return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
     }
 
     getUserData.storeName = storeName
@@ -277,11 +276,11 @@ exports.createBrandDetails = async (req, res) => {
 
     await getUserData.save()
 
-    return res.status(200).json({ status: 200, message: "Brand Details Set SuccessFully...", user: getUserData })
+    return res.status(200).json({ status: 200, success: true, message: "Brand Details Set SuccessFully...", data: getUserData })
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -294,7 +293,7 @@ exports.setBankDetails = async (req, res) => {
     let getUserData = await user.findById(id)
 
     if (!getUserData) {
-      return res.status(404).json({ status: 404, message: "User Not Found" })
+      return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
     }
 
     getUserData.accountNumber = accountNumber
@@ -303,11 +302,11 @@ exports.setBankDetails = async (req, res) => {
 
     await getUserData.save()
 
-    return res.status(200).json({ status: 200, message: "Bank Details Set SuccessFully...", user: getUserData })
+    return res.status(200).json({ status: 200, success: true, message: "Bank Details Set SuccessFully...", data: getUserData })
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -320,7 +319,7 @@ exports.pickUpAddress = async (req, res) => {
     let getUserData = await user.findById(id)
 
     if (!getUserData) {
-      return res.status(404).json({ status: 404, message: "User Not Found" })
+      return res.status(404).json({ status: 404, success: false, message: "User Not Found" })
     }
 
     getUserData.buildingNumber = buildingNumber
@@ -332,11 +331,11 @@ exports.pickUpAddress = async (req, res) => {
 
     await getUserData.save()
 
-    return res.status(200).json({ status: 200, message: "Pickup Address Set SuccessFully...", user: getUserData })
+    return res.status(200).json({ status: 200, success: true, message: "Pickup Address Set SuccessFully...", data: getUserData })
 
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ status: 500, message: error.message })
+    return res.status(500).json({ status: 500, success: false, message: error.message })
   }
 }
 
@@ -465,6 +464,7 @@ exports.userDasboard = async (req, res) => {
     ]);
 
     return res.status(200).json({
+      status: 200,
       success: true,
       data: {
         categories,
@@ -473,6 +473,7 @@ exports.userDasboard = async (req, res) => {
         specialOffers
       }
     });
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: 500, success: false, message: error.message });

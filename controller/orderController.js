@@ -11,14 +11,14 @@ exports.createOrder = async (req, res) => {
         items = await cart.find({ userId: req.user._id })
 
         if (!items) {
-            return res.status(404).json({ status: 404, message: "Cart Item Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Cart Item Not Found" })
         }
 
         let coupon;
         if (coupenId) {
             coupon = await Coupon.findById(coupenId);
             if (!coupon) {
-                return res.status(404).json({ message: 'Coupon Not Found' });
+                return res.status(404).json({ status: 404, success: false, message: 'Coupon Not Found' });
             }
         }
 
@@ -48,11 +48,11 @@ exports.createOrder = async (req, res) => {
             totalAmount
         });
 
-        return res.status(201).json({ status: 201, message: "Order Create SuccessFully....", order: orderCreate })
+        return res.status(201).json({ status: 201, success: true, message: "Order Create SuccessFully....", data: orderCreate })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -62,7 +62,7 @@ exports.getAllOrders = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedOrders;
@@ -113,7 +113,7 @@ exports.getAllOrders = async (req, res) => {
         let count = paginatedOrders.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
         if (page && pageSize) {
@@ -122,11 +122,11 @@ exports.getAllOrders = async (req, res) => {
             paginatedOrders = await paginatedOrders.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalOrders: count, message: "All Orders Found SuccessFully...", orders: paginatedOrders })
+        return res.status(200).json({ status: 200, success: true, totalOrders: count, message: "All Orders Found SuccessFully...", data: paginatedOrders })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -183,14 +183,14 @@ exports.getOrderById = async (req, res) => {
         ])
 
         if (!getOrderId) {
-            return res.status(404).json({ status: 404, message: "Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Order Found SuccessFully...", order: getOrderId })
+        return res.status(200).json({ status: 200, success: true, message: "Order Found SuccessFully...", data: getOrderId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -201,16 +201,16 @@ exports.updateOrderStatusById = async (req, res) => {
         let updateOrderId = await order.findById(id)
 
         if (!updateOrderId) {
-            return res.statsu(404).json({ status: 404, message: "Order Not Found" })
+            return res.statsu(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
         updateOrderId = await order.findByIdAndUpdate(id, { ...req.body }, { new: true })
 
-        return res.status(200).json({ status: 200, message: "Order Status Updated SuccessFully...", order: updateOrderId })
+        return res.status(200).json({ status: 200, success: true, message: "Order Status Updated SuccessFully...", data: updateOrderId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -221,16 +221,16 @@ exports.deleteOrderById = async (req, res) => {
         let deleteOrderId = await order.findById(id)
 
         if (!deleteOrderId) {
-            return res.status(404).json({ status: 404, message: "Order Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
         await order.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Order Delete SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Order Delete SuccessFully..." })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -240,7 +240,7 @@ exports.getAllMyOrders = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedMyOrders;
@@ -296,7 +296,7 @@ exports.getAllMyOrders = async (req, res) => {
         let count = paginatedMyOrders.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: 'Order Not Found' })
+            return res.status(404).json({ status: 404, success: false, message: 'Order Not Found' })
         }
 
         if (page && pageSize) {
@@ -305,10 +305,10 @@ exports.getAllMyOrders = async (req, res) => {
             paginatedMyOrders = await paginatedMyOrders.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalMyOrders: count, message: "All Orders Found SuccessFully...", allMyOrders: paginatedMyOrders })
+        return res.status(200).json({ status: 200, success: true, totalMyOrders: count, message: "All Orders Found SuccessFully...", data: paginatedMyOrders })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
